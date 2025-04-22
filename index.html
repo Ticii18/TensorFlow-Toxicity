@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Detector de Toxicidad</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/toxicity"></script>
+
+  <style>
+
+  </style>
+</head>
+<body>
+
+  <h2>Ingrese un insulto</h2>
+
+  <input type="text" id="texto" placeholder="Escribe algo aquí">
+  <br>
+  <button id="botonVerificar" onclick="verificar()" disabled>Verificar</button>
+
+  <pre id="resultado">Cargando modelo...</pre>
+
+  <script>
+    let modelo;
+
+    window.onload = function () {
+      toxicity.load(0.9).then(m => {
+        modelo = m;
+        document.getElementById("botonVerificar").disabled = false;
+        document.getElementById("resultado").innerText = "Modelo cargado. Podés escribir algo y verificar.";
+      }).catch(err => {
+        document.getElementById("resultado").innerText = "Error al cargar el modelo.";
+        console.error(err);
+      });
+    };
+
+    function verificar() {
+      let textoUsuario = document.getElementById("texto").value;
+      let resultado = document.getElementById("resultado");
+
+      if (!textoUsuario.trim()) {
+        resultado.innerText = "Por favor, escribí algo.";
+        return;
+      }
+
+      if (!modelo) {
+        resultado.innerText = "El modelo aún no está listo.";
+        return;
+      }
+
+      modelo.classify([textoUsuario]).then(predicciones => {
+        resultado.innerText = JSON.stringify(predicciones, null , 2);
+      });
+    }
+  </script>
+
+</body>
+</html>
